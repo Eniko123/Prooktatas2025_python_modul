@@ -1,1 +1,117 @@
+def divisors():
+    """
+    This function gets a number from the user and shows the divisors of that number.
+    """
+
+    number = int(input("Enter a number to see its divisors."))
+    divisor = '1'
+
+    i = 2
+    while i <= number//2:
+        if number % i == 0:
+            divisor += ';' + str(i)
+        i+=1
+
+    print(f'{number} divisors: {divisor}')
+
+
+def perfect_number():
+    """"
+    This function Determines whether a user-provided number is a perfect number.
+    A perfect number equals the sum of its proper divisors.
+    """
+
+    number = int(input("Enter a number to see its divisors."))
+    divisor_sum = 1
+
+    i = 2
+    while i <= number // 2:
+        if number % i == 0:
+            divisor_sum += i
+        i += 1
+
+    if divisor_sum == number:
+        print("This number is a perfect number!")
+    else:
+        print("This number is not a perfect number")
+
+
+def perfect_number_top():
+    """
+    Finds and prints all perfect numbers up to a user-defined limit.
+    """
+
+    top_number = int(input('Please enter a number that you would like to analyze: '))
+    perfect_numbers = [ ]
+
+    number = 6
+    while number <= top_number:
+        divisor_sum = 1
+        divisor = 2
+        while divisor <= number//2:
+            if number % divisor == 0:
+                divisor_sum += divisor
+            divisor += 1
+        if divisor_sum == number:
+            perfect_numbers.append(number)
+        number += 1
+
+    print(f'Perfect numbers until {top_number} are: {perfect_numbers}')
+
+
+def string_operations():
+    """"
+    Performs several basic string operations:
+    replaces characters, checks for word presence, analyzes start/end, and enumerates characters with their indexes.
+    """
+
+    sentence = "The curious cat tiptoed across the windowsill, chasing shadows in the morning light."
+
+    print(sentence.replace("u", "a"))
+
+    if "cat" not in sentence:
+        print("The word 'cat' is in the sentence!")
+    else:
+        print("The word 'cat' is not in the sentence!")
+
+    print(f'start: {sentence.startswith("The")}, end:{sentence.endswith("morning")}')
+
+    characters_with_index = list(enumerate(sentence))
+    print(characters_with_index)
+
+
+def variant_swap():
+    """
+    This function swaps the variants.
+    """
+
+    a = 7
+    b = 5
+
+    temp = a
+    a = b
+    b = temp
+
+    print(a, b)
+
+
+import math
+def prime():
+    """
+    Determines whether a user-provided number is prime.
+    """
+
+    number = int(input("Enter a number that you would like to analyze: "))
+
+    i = 2
+    prime = True
+    while i <= math.sqrt(number):
+        if number % i == 0:
+            prime = False
+        i += 1
+
+    if prime:
+        print("This number is a prime.")
+    else:
+        print("This number is not a prime.")
 
