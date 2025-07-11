@@ -1,1 +1,66 @@
+def without_space():
+    """
+    This function removes the spaces from a text.
+    """
+
+    sentence = input("Enter the sentence from which you would like to remove spaces: ")
+    only_words = ""
+
+    for c in sentence:
+        if c != " ":
+            only_words +=c
+
+    print(only_words)
+
+
+
+def palindrome():
+    """
+    This function checks whether the input is a palindrome.
+    """
+
+    palindrome_sentence = input("Enter the text you would like to analyze: ")
+    empty = ""
+
+    for c in palindrome_sentence:
+        if c.isalnum():
+            empty += c.lower()
+
+    if empty == empty [::-1]:
+        print("This is a palindrome text.")
+    else:
+        print("This is not a palindrome text")
+
+
+def even():
+    """
+    This function checks whether the number is even or odd.
+    """
+
+    number = int(input("Enter a number you would like to analyze: "))
+
+    if number % 2 == 0:
+        print("The number is even.")
+    else:
+        print("The number is odd.")
+
+
+def point_number():
+    """
+    This function counts how many times each score occurs between 1 and 10.
+    """
+
+    points = input("Insert here the scores! When done, press enter.")
+    scores = []
+
+    while points != "":
+        if points.isdigit():
+            scores.append(int(points))
+            points = input("Insert here the scores! When done, press enter.")
+        else:
+            break
+
+    i = 1
+    for i in range(1,11):
+        print(f'{i} points: {scores.count(i)} times.')
 
