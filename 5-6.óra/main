@@ -1,1 +1,255 @@
+"""
+I. feladat
 
+A program bekér egy szöveget és a választásod alapján
+kiír ezt-azt a szövegről. Üres szövegre leáll.
+Olvassunk be egy szöveget.
+
+Kérdezzük meg a felhasználót, hogy mit szeretne:
+a) Kiírjuk hány 'a' betű van a szövegben
+b) Kiírjuk a szöveg hosszát
+c) Kiírjuk a szöveg nagybetűs változatát
+
+Addig ismételjük a fentebb írtakat,
+amíg üres szöveget nem ad meg a felhasználó.
+Mind a három feladatot (a, b, c)
+saját külön függvényekkel oldjunk meg.
+"""
+
+#### These are the helper functions of the first task ####
+def count_letter_a(text):
+    letter_a = text.count("a")
+    print(f'The number of letter "a" in the text: {letter_a}')
+def length_of_text(text):
+    length = len(text)
+    print(f'The length of the text: {length}')
+def text_upper(text):
+    upper = text.upper()
+    print(f'The uppercase version of the text: {upper}')
+##########################################################
+
+def first_task():
+    """
+    This function continuously prompts the user for a text and an action to perform on it.
+    Supports counting the letter 'a', checking the text length, and converting it to uppercase.
+    """
+
+    text = input("Enter here the text you would like to analyze:")
+    choice = input("What would you like to do with the text?\nCount letter 'a' in the text - count | Check the text length - length | Show the uppercase version - upper\n")
+    while text != "":
+        if choice.lower() == "count":
+            count_letter_a(text)
+        elif choice.lower() == "length":
+            length_of_text(text)
+        elif choice.lower() == "upper":
+            text_upper(text)
+        else:
+            print('Invalid input')
+        text = input("Enter here the text you would like to analyze:")
+        choice = input("What would you like to do with the text?\nCount letter 'a' in the text - count | Check the text length - length | Show the uppercase version - upper\n")
+
+
+"""
+II. Feladat
+
+Egy kör sugarát kérjük be és kiírjuk a
+kerületét cm-ben és a területét cm²-ben.
+Kérjük be a felhasználótól egy kör sugarát, cm-ben értve.
+
+Feltételezhetjük, hogy a felhasználó valóban
+számot ad meg, de az lehet tört szám is.
+Írj két saját függvényt a kör
+adatainak a kiszámításához.
+
+Az egyik függvény neve 'kerulet' legyen,
+bemenő paramétere a kör sugara cm-ben.
+A függvény számolja ki a kör kerületét és
+írja is ki az eredményt a konzolra a minta szerint, cm-ben.
+
+A másik függvény neve 'terulet' legyen,
+bemenő paramétere a kör sugara cm-ben.
+A függvény számolja ki a kör területét és
+adja vissza az eredményt.
+A szöveges, minta szerinti cm²-ben számolt
+kiírást a főprogramban hajtsuk végre.
+Az eredményeket mindkét esetben 2 tizedesre kerekítsük.
+"""
+
+#### These are the helper functions of the second task ####
+import math
+def area(radius):
+    area = math.pi * math.sqrt(radius)
+    print(f'The are of your circle: {round(area, 2)}cm^2')
+def perimeter(radius):
+    perimeter = 2 * math.pi * radius
+    print(f'The perimeter of your circle: {round(perimeter,2)}cm')
+###########################################################
+
+def second_task():
+    """
+    This function prompt the user to input the radius of a circle in centimeters.
+    Based on the user's choice the function computes  area or the perimeter.
+    """
+
+    radius = int(input("Please enter the radius of your circle in cm: "))
+    choice = input("What would like to calculate? (area/perimeter)\n")
+
+    if choice == "area":
+        area(radius)
+    elif choice == "perimeter":
+        perimeter(radius)
+    else:
+        print('Invalid input.')
+
+
+"""
+III. feladat
+
+Beolvasunk 5 egész számot és e
+listárólírunk ki információkat.
+Mindegyik alábbi feladathoz készítsünk saját függvényt.
+A 2. feladattól kezdve a függvények bemenő
+paramétere a lista, visszatérési értékük
+pedig a kiíratandó teljes szöveges válasz a kérdésre.
+
+1. Olvassunk be öt egész számot egy listába.
+Feltételezhetjük, hogy a felhasználó
+valóban csak egész számokat ad meg.
+
+2. Írjuk ki a lista elemeit egy sorban,
+kötőjellel elválasztva, abban a sorrendben,
+ahogy azt a felhasználó megadta.
+
+3. Írjuk ki a lista elemeit fordított sorrendben,
+egy sorban, kötőjellel elválasztva.
+
+4. Írjuk ki, hányadik elem a legkisebb és mennyi az.
+
+5. Írjuk ki, hányadik elem a legnagyobb és mennyi az.
+
+6. Írjuk ki melyik elem áll a legközelebb
+a teljes lista átlagához és hogy az hányadik elem.
+"""
+
+#### These are the helper functions of task two ####
+def reverse(dash_iput):
+    print(f'The revered list of your input numbers: {dash_iput[::-1]}')
+def smallest(dash_iput):
+    number_list = [int(numbers) for numbers in dash_iput.split("-")]
+    number_list.sort()
+    print(f'This smallest number in the list is {number_list[0]}')
+def biggest(dash_iput):
+    number_list = [int(numbers) for numbers in dash_iput.split("-")]
+    number_list.sort()
+    print(f'This biggest number in the list is {number_list[4]}')
+def closest_to_mean(dash_iput):
+    number_list = [int(numbers) for numbers in dash_iput.split(("-"))]
+    mean = sum(number_list)/len(number_list)
+    mean_number_list = [((abs(number - mean), number)) for number in number_list]
+    mean_number_list.sort()
+    print(f'The number closest to the mean is: {mean_number_list[0][1]}')
+####################################################
+
+def third_task():
+    """
+    This function asks the user to enter five numbers,
+    then displays reverse order, min, max, and the value closest to the mean
+    """
+    number_list = ""
+    count = 0
+    while count < 5:
+        iput = input("Enter here a number, than press enter: ")
+        number_list += iput
+        count += 1
+
+    dash_iput = "-".join(number_list)
+    print(f'Your input list: {dash_iput}')
+
+    reverse(dash_iput)
+    smallest(dash_iput)
+    biggest(dash_iput)
+    closest_to_mean(dash_iput)
+
+
+"""
+IV. Feladat
+
+Egy pozitív egész számot alakítunk bináris számmá.
+Olvassunk be egy pozitív egész számot
+és írjuk ki a bináris alakját.
+
+A beépített bin() függvényt nem használhatod!
+
+Ehhez készítsünk egy dec_bin() függvényt,
+amelynek van egy bemenő paramétere és
+sztringesen adja vissza a bináris értékét.
+
+A felhasználó biztosan egész számot ad meg,
+azt nem kell ellenőrizni.
+
+A program kommunikációját a
+mintának megfelelően alakítsd.
+"""
+
+#### This is the helper function of the forth task ####
+def dec_bin(dec):
+    bin = ""
+    while dec > 0:
+        bin = str(dec % 2) + bin
+        dec = dec // 2
+    return bin
+#######################################################
+
+def forth_task():
+    """
+    This function converts a decimal number to its binary representation as a string.
+    """
+    number =  int(input("Please enter a number here: "))
+    print(f'{number} binary: {dec_bin(number)}')
+
+
+"""
+VI. feladat
+
+A program induláskor kérjen be egy nevet
+és egy születési évszámot, majd írja ki
+hány keresztneve van az illetőnek,
+és 2030-ban hányadik születésnapja lesz.
+
+A kor meghatározásához hozz létre egy függvényt,
+kor2030 néven, ami a paraméterként kapott
+évszám alapján kiszámolja a 2030-ban betöltött kort!
+
+A függvény csak adja visszatérési értékül
+a számítás eredményét, de a képernyőre ne írja ki!
+
+Amíg a felhasználó kéri, kérje a következő nevet.
+
+A program kommunikációját a mintának
+megfelelően szövegezd.
+
+Abban biztosak lehetünk, hogy a felhasználó
+egy-egy szóközzel választja csak el a
+szavakat és a születési évszámot.
+"""
+
+#### This is the helper function of task six ####
+def age2030(birth_date):
+    splitted = birth_date.split()
+    birth_year = int(splitted[0])
+    print(f'This person will be {2030-birth_year} years old at 2030.')
+#################################################
+
+def sixth_task():
+    """
+    This function collects names and birth dates, prints first name count and age in the year 2030.
+    """
+    name = input("Please enter a name (when you are done press enter): ")
+    birth_date = input("Please enter here a date of birth (when you are done press enter): ")
+    while birth_date or name != "":
+        name_list = name.split()
+        name_length =  len(name_list) - 1
+        print(f'This person has {name_length} first name.')
+        age2030(birth_date)
+        name = input("Please enter a name (when you are done press enter): ")
+        birth_date = input("Please enter here a date of birth (when you are done press enter): ")
