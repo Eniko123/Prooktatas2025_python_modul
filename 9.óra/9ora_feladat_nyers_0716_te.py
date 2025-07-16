@@ -55,7 +55,6 @@ def nyolcadik_feladat():
     random.shuffle(items)
     print(items)
 
-
 import datetime
 def kilencedik_feladat():
     eltolas = datetime.timedelta(days = 3, hours = 4, minutes = 30)
@@ -119,7 +118,6 @@ def tizenkilencedik_feladat():
         list.append(random.random())
         counter += 1
     print(list)
-
 
 import random
 def huszadik_feladat():
