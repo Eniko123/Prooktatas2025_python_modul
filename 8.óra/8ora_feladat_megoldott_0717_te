@@ -1,0 +1,97 @@
+import random
+import math
+import datetime
+import statistics
+#### These are the helper functions of the first task ####
+numbers = []
+def number_generator():
+    counter = 0
+    while counter < 10:
+        numbers.append(random.randint(0, 100))
+        counter += 1
+    print(numbers)
+def statistic_analyses():
+    statistic_dictionary = {}
+    mean = sum(numbers)/len (numbers)
+    S_D = statistics.stdev(numbers)
+    minimum = min(numbers)
+    maximum = max(numbers)
+    S_R = math.sqrt(sum(numbers))
+    print(f"Statistical analyses was conducted on the generate numbers.\nmean = {mean}, SD = {S_D}, min = {minimum}, max = {maximum}, SR = {S_R}")
+def lucky_number():
+    lucky_number = random.choice(numbers)
+    return lucky_number
+def today():
+    date = datetime.date.today()
+    return date
+##########################################################
+def first_task():
+    """
+    This function generates random numbers, performs statistical analysis,
+    and prints today's date with a lucky number.
+    """
+
+    number_generator()
+    statistic_analyses()
+    print(f' Today is {today()} and the lucky number for the day is {lucky_number()}')
+
+
+import datetime
+def second_task():
+    """
+    This function asks for your next birthday and calculates how many days are left until that date.
+    """
+
+    birth_date = input("Enter here your next birth date and I will tell you how many days left until it (YYYY-MM-DD):\n")
+    date = datetime.datetime.today()
+    birth_date_obj = datetime.datetime.strptime(birth_date, '%Y-%m-%d')
+    days_left = birth_date_obj - date
+    print(days_left.days)
+
+
+import random
+import math
+def third_task():
+    """
+    This function tests the user's estimation of sine and cosine values for a randomly generated angle in degrees.
+    """
+
+    angle = random.randint(1,360)
+    print(f'The angle is {angle} degree')
+    sinus_est = float(input("What do you think the sinus of this angle is?\n"))
+    cosinus_est = float(input("What do you think the cosinus of this angle is?\n"))
+    angle_rad = math.radians(angle)
+    sinus = math.sin(angle_rad)
+    cosinus = math.cos(angle_rad)
+    print(f"\nActual sinus: {round(sinus, 4)}")
+    print(f"Actual cosinus: {round(cosinus, 4)}")
+    print(f"You were off by {round(sinus-sinus_est, 4)} for sinus and {round(cosinus-cosinus_est, 4)} for cosinus.")
+
+
+import random
+import datetime
+def forth_task():
+    """
+    This function generates two random dates between 2000 and 2025 and prints the number of days between them.
+    """
+
+    big = datetime.datetime(2000, 1, 1)
+    end = datetime.datetime(2025, 12, 31)
+
+    days_between = (big - end).days
+    random_days1 = random.randint(0, days_between)
+    random_date1 = big + datetime.timedelta(days=random_days1)
+
+    random_days2 = random.randint(0, days_between)
+    random_date2 = big + datetime.timedelta(days=random_days2)
+
+    difference = random_date2-random_date1
+    print(f'The first date is {random_date1}, the second date is {random_date2}. The difference between them is {difference.days} days.')
+
+
+def main():
+    first_task()
+    second_task()
+    third_task()
+    forth_task()
+main()
