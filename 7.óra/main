@@ -1,1 +1,157 @@
+"""
+I. Feladat
 
+Írj egy gyenge_jelszavak nevű függvényt,
+amely egy jelszavakat tartalmazó listát kap paraméterül!
+
+A függvény adja vissza ezek közül a gyenge jelszavakat egy listában!
+Egy jelszót gyengének tekintünk, ha az alábbi feltételek közül legalább 1 érvényes rá:
+
+•	A jelszó rövidebb, mint 5 karakter
+•	A jelszó nem tartalmaz számjegy karaktert
+•	A jelszó tartalmazza a jelszo vagy 123 szövegek valamelyikét bármilyen formában
+    (a kis- és nagybetűket nem megkülönböztetve).
+
+Írd ki az erős jelszavakat egy txt fájlba, valamint a gyenge jelszavakat is.
+
+Írj eros_jelszavak nevű függvényt, melynek paramétere a jelszó hossza (alapból 8)
+illetve a másik paraméter, hogy hány jelszót állítson elő (alapból 1),
+amely egy jelszavakat tartalmazó listával tér vissza.
+
+A jelszót a 0..9-ig valamint az angol abc a..z
+és általad választott speciális karakterek kombinációja alkossa.
+"""
+
+import random
+import string
+def strong_password(length = 8, passwords_generated = 1 ):
+    """
+    This function generates random strong passwords using letters, digits, and special characters, and saves them to a file.
+    """
+    
+    options = list(string.ascii_lowercase + string.digits + "!@#$%^&*()-_=+[]{};:,.<>?/|")
+
+    with open("strong_password.txt", "w", encoding="utf-8") as file:
+        for _ in range(passwords_generated):
+            password_list = []
+            for _ in range(length):
+                password_list.append(random.choice(options))
+            password = ''.join(password_list)
+            print(password)
+            file.write(password + "\n")
+
+def weak_password():
+    """
+    This function analyzes multiple user-entered passwords and logs each weak one to a file.
+    """
+    
+    passwords = input("Please enter the password that you would like to analyze: ")
+
+    for password in passwords:
+        is_weak = (
+                len(password) <= 5
+                or password.isdigit()
+                or "jelszo" in password.lower()
+                or "123" in password.lower()
+        )
+
+        if is_weak:
+            with open("weak_password.txt", "a", encoding="utf-8") as file:
+                file.write(password + "\n")
+            print(f"'{password}' is a weak password. It has been logged.")
+        else:
+            print(f"'{password}' seems strong enough.")
+
+
+"""
+II.Feladat
+
+A hatványozás elvégezhető annál gyorsabban is,
+mintha a kitevőnek megfelelő számú szorzást csinálnánk.
+
+Pl. a8 = a4·a4, a4 = a2·a2 és a2 = a·a miatt a nyolcadikra hatványozáshoz
+mindössze három szorzásra van szükség.
+A következő megfigyelést tehetjük:
+
+Írj rekurzív függvényt, amely a fentiek alapján végzi el a hatványozást!
+Paraméterei legyenek az alap és a kitevő, visszatérési értéke pedig a hatvány.
+Írd ki kettő első tizenhat hatványát!
+
+A rekurzív függvénybe most se tegyél ciklust, dolgozz a definíció alapján!
+Ahhoz, hogy ez működjön, még egy báziskritériumot be kell vezetned,
+amit a fenti definíció nem tartalmaz.
+Mi lehet az?
+
+A szükséges báziskritérium: ha k == 0, akkor a hatvány értéke 1.
+
+Vagyis annak rögzítése, hogy bármelyik szám 0. hatványa 1.
+A rekurzióban közeledünk ehhez a báziskritériumhoz,
+mert mindig felezzük a kitevőt, vagy levonunk belőle 1-et.
+
+A k == 1 esetet is vehetnénk báziskritériumnak,
+de a k == 0 még jobb, még ha nem is tűnik intuitívnak elsőre.
+
+Így legalább arra is működik a program.
+a1 értéke így a * a0 módon számítódik ki.
+"""
+
+def power(a, k):
+    if k == 0:
+        return 1
+    elif k % 2 == 0:
+        print(f'if a: {a} : k : {k}')
+        return power(a * a, k // 2)
+    else:
+        print(f'if a: {a} : k : {k}')
+        return a * power(a, k - 1)
+
+def second_task():
+    for k in range(0, 16):
+        print(power(2, k))
+
+
+"""
+III. Feladat
+Írj egy sorozat nevű függvényt, amely egy számokból álló listát kap paraméterül!
+A függvény döntse el, hogy a listában szereplő számok
+számtani, illetve mértani sorozatot alkotnak-e!
+
+Kezeld le azt az esetet, amikor a függvény paraméterében
+érkező lista 3-nál kevesebb elemet tartalmaz!
+
+Ekkor a visszatérési érték a HIBA! szöveg legyen!
+Ezeket a hibas_eset.txt –ben tárold el.
+
+Egyéb hibakezeléssel is kell foglalkoznod amennyiben a program ezt igényli.
+     ┌
+     │ (a·a)k/2, ha k páros
+ak = ┤
+     │ a·ak-1, ha k páratlan.
+     └
+"""
+
+def third_task():
+    """
+    This function checks whether a user-entered, at least 3-element number sequence is arithmetic or geometric.
+    """
+
+    try:
+        sequence = list(map(int, input("Enter here the list that you would like to analyze:\n").split()))
+    except ValueError:
+        print("Invalid input! Please enter integers separated by spaces.")
+        return
+
+    if len(sequence) < 3:
+        try:
+            with open("error_file.txt", "w", encoding='utf-8') as file:
+                file.write("ERROR! Too few elements.\n")
+        except (IOError, Exception) as e:
+            print(f'File write error: {e}')
+        return
+
+    if sequence[1] - sequence[0] == sequence[2] - sequence[1]:
+        print("This is an arithmetic sequence.")
+    elif sequence[1] / sequence[0] == sequence[2] / sequence[1]:
+        print("This is a geometric sequence.")
+    else:
+        print("This is neither arithmetic nor geometric.")
