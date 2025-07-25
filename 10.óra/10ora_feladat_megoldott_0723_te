@@ -1,0 +1,167 @@
+from asyncore import write
+from symbol import try_stmt
+def first_task():
+    """
+    This function reads a list of students and their scores from a file,
+    then prints statistics and saves those who passed to a new file.
+    """
+
+    dictionary = {}
+    with open ('01_feladat.txt', "r", encoding = "utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if ";" in line:
+                name, point = line.split(";")
+                dictionary[name] = int(point)
+            print(f'{name} points: {point}')
+
+    point_sum = sum(dictionary.values())/len(dictionary)
+    print(f'The avarage point number was {point_sum}')
+
+    count = 0
+    for student in dictionary:
+        if dictionary[student] > 60:
+            count += 1
+    print(f'{count} student was achived more than 60 points.')
+
+    minimum = min(dictionary.items(), key=lambda item: item[1])
+    name_min, point_min = minimum
+    print(f'The student with the lowest point was {name_min} and the point number was {point_min}')
+    maximum = max(dictionary.items(), key=lambda item: item[1])
+    name_max, point_max = maximum
+    print(f'The student with the highest point was {name_max} and the point number was {point_max}')
+
+    with open("01_eredmeny.txt", "w", encoding = "utf-8") as file:
+        for students in dictionary:
+            if dictionary[students] > 60:
+                file.write(f'{students};{dictionary[students]}\n')
+
+
+import random
+def second_task():
+    """
+    This function generates five random lottery numbers and compares them to player numbers
+    from a file, then writes the matching numbers for each player to a new file.
+    """
+
+    count = 0
+    lottery_numbers =[]
+    while count < 5:
+        lottery_numbers.append(random.randint(1,99))
+        count += 1
+
+    dictionary = {}
+    with open ("02_feladat.txt", "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            if ";" in line:
+                name, numbers_str = line.split(";")
+                numbers = [int(num) for num in numbers_str.split(",")]
+                dictionary[name] = numbers
+
+    with open ("02_eredmeny.txt", "w", encoding="utf-8") as file:
+        for participants in dictionary:
+            same = set(lottery_numbers) & set(dictionary[participants])
+            file.write(f'{participants};{same}\n')
+            
+
+def third_task():
+    """
+    This function reads item orders from a file, aggregates the quantities,
+    and writes the total, specific item count, and most ordered item to a new file.
+    """
+
+    dictionary = {}
+    with open ("03_feladat.txt", "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            name, count = line.split(";")
+            if name in dictionary:
+                dictionary[name] += int(count)
+            else:
+                dictionary[name] = int(count)
+
+    with open ("03_eredmenyek.txt", "w", encoding="utf-8") as file:
+        sum_items = sum(dictionary.values())
+        file.write(f'All together {sum_items} item was ordered.\n')
+
+        file.write(f'The number of "Pékárú" ordered was {dictionary["Pékáru"]}.\n')
+
+        maximum = max(dictionary.items(), key=lambda item: item[1])
+        name_max, count_max = maximum
+        file.write(f'The most ordered item was on the list is {name_max} and it was ordered {count_max} times.')
+
+
+def forth_task():
+    """
+    This function reads book borrow counts from a file, splits them by threshold,
+    and writes categorized summaries and the most borrowed book to a result file.
+    """
+
+    dictionary = {}
+    with open ("04_feladat.txt", "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            name, borrow = line.split(";")
+            dictionary[name] = int(borrow)
+
+    with open("04_eredmeny.txt", "w", encoding="utf-8") as file:
+        less_than_10 = {}
+        at_least_10 = {}
+        counter = 0
+        for books in dictionary:
+            if dictionary[books] >= 10:
+                counter += 1
+                at_least_10[books] = dictionary[books]
+            else:
+                less_than_10[books] = dictionary[books]
+        file.write(f'{counter} books were borrowed at least 10 times.\n')
+        file.write(f'The books borrowed less than 10 times: {less_than_10}\n')
+        file.write(f'The books borrowed at least 10 times: {at_least_10}\n')
+
+        maximum = max(dictionary.items(), key=lambda item: item[1])
+        name_max, borrow_max = maximum
+        file.write(f'The book borrowed the most times was: {name_max}, and it was borrowed {borrow_max} times.')
+
+
+def fifth_task():
+    """
+    This function reads running times from a file, calculates statistics,
+    and writes categorized results and performance summaries to a new file.
+    """
+
+    dictionary = {}
+    with open ("05_futoverseny.txt", "r", encoding="utf-8") as file:
+        for line in file:
+            line = line.strip()
+            name, time = line.split(";")
+            dictionary[name] = float(time)
+
+    with open ("05_eredmenyek.txt", "w", encoding="utf-8") as file:
+        mean = sum(dictionary.values())/len(dictionary)
+        file.write(f'The mean of the running times: {round(mean, 2)}\n')
+
+        less_than_15 = {}
+        counter = 0
+        for participant in dictionary:
+            if dictionary[participant] < 15.0:
+                less_than_15[participant] = dictionary[participant]
+            if dictionary[participant] < 13.0:
+                counter += 1
+        file.write(f'The participants who ran under 15 minutes {less_than_15}\n')
+        file.write(f'From that {counter} participant ran under 13 minutes\n')
+
+        minimum = min(dictionary.items(), key=lambda item: item[1])
+        name_min, time_min = minimum
+        file.write(f'The fastest runner was {name_min} and the running time was {time_min}\n')
+        maximum = max(dictionary.items(), key=lambda item: item[1])
+        name_max, time_max = maximum
+        file.write(f'The slowest runner was {name_max} and the running time was {time_max}')
+
+
+def main():
+    first_task()
+    second_task()
+    third_task()
+    forth_task()
+    fifth_task()
