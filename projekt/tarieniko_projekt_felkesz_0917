@@ -1,0 +1,292 @@
+from PIL import Image
+import os
+from bs4 import BeautifulSoup
+import requests
+from io import BytesIO
+from urllib.parse import urljoin
+from typing import Optional
+import argparse
+import numpy as np
+
+class PictureLoader:
+    def __init__(self):
+        self.image = None
+        self.og_filename = None
+
+    def load_from_url(self, url: str) -> Image:
+        """Kép betöltése url alapján"""
+
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+
+            if "image" in response.headers.get("Content-Type", ""):
+                self.image = Image.open(BytesIO(response.content)).convert('RGB')
+                self.og_filename = os.path.basename(url)
+                return self.image, self.og_filename
+
+            soup = BeautifulSoup(response.content, "html.parser")
+            image = soup.find_all("img")
+
+            if len(image) == 0:
+                raise Exception("Az oldalon nem található kép.")
+            if len(image) == 1:
+                img_url = urljoin(url, image[0]["src"])
+                img_response = requests.get(img_url)
+                img_response.raise_for_status()
+                self.image = Image.open(BytesIO(img_response.content)).convert('RGB')
+                self.og_filename = os.path.basename(url)
+                return self.image, self.og_filename
+            else:
+                raise Exception("Az oldal több képet tartalmaz, kérlek add meg pontosabban.")
+
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Hálózati hiba: {e}")
+
+    def load_from_computer(self, path: str) -> Image:
+        """Kép betöltése számítógépes elérési útvonal alapján"""
+
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Nem található a fájl: {path}")
+
+        try:
+            self.image = Image.open(path).convert('RGB')
+            self.og_filename = os.path.basename(path)
+            return self.image, self.og_filename
+        except Exception as e:
+            raise ValueError(f"Nem lehet kép formátumban megnyitni a fájlt: {e}")
+
+    def save_ppm(self, filename: Optional[str] = None):
+        """Kép mentése"""
+        
+        os.makedirs('PictureEditer_images', exist_ok=True)
+
+        if filename is not None:
+            path = os.path.join("PictureEditer_images", filename)
+        else:
+            path = os.path.join("PictureEditer_images", self.og_filename)
+
+        self.image.save(path, format="PPM")
+
+class PictureEdit:
+    @staticmethod
+    def brightness(image: Image, constant: int | float) -> Image:
+        """ Ha negatív a konstans sötétíti ha pozitív világosítja a képet"""
+
+        pixels = image.load()
+        width, height = image.size
+
+        for y in range(height):
+            for x in range(width):
+                r, g, b = pixels[x, y]
+                r = r + constant
+                g = g + constant
+                b = b + constant
+                pixels[x, y] = (int(r), int(g), int(b))
+
+        pixels = np.clip(pixels, 0, 255).astype(np.uint8)
+        return image
+
+    @staticmethod
+    def contrast(image: Image, alpha: float) -> Image:
+        """Beállítja a kép kontrasztját"""
+
+        pixels = image.load()
+        width, height = image.size
+
+        for y in range(height):
+            for x in range(width):
+                r, g, b = pixels[x, y]
+                r = alpha * (r - 128) + 128
+                g = alpha * (g - 128) + 128
+                b = alpha * (b - 128) + 128
+                pixels[x, y] = (int(r), int(g), int(b))
+
+        pixels = np.clip(pixels, 0, 255).astype(np.uint8)
+        return image
+
+    @staticmethod
+    def invert(image: Image) -> Image:
+        """Negatív inverziós képet hoz létre"""
+
+        pixels = image.load()
+        width, height = image.size
+
+        for y in range(height):
+            for x in range(width):
+                r, g, b = pixels[x, y]
+                r = 255 - r
+                g = 255 - g
+                b = 255 - b
+                pixels[x, y] = (int(r), int(g), int(b))
+
+        pixels = np.clip(pixels, 0, 255).astype(np.uint8)
+        return image
+
+    @staticmethod
+    def blurring(image: Image) -> Image:
+        """Elmossa a képen a zajt és az apró részleteket"""
+
+        img = image.load()
+        arr = np.array(img)
+        height, width, color = arr.shape
+
+        kernel_box = [
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1]
+        ]
+        kernel_box = np.array(kernel_box)
+        kernel_height, kernel_width = kernel_box.shape
+
+        padded = np.pad(arr, ((1, 1), (1, 1), (0, 0)), mode="edge")
+        new_matrix = np.zeros_like(arr)
+
+        for y in range(height):
+            for x in range(width):
+                for c in range(color):
+                    region = padded[y:y + 3, x:x + 3, c]
+                    new_pixel = np.sum(region * kernel_box) // 9
+                    new_matrix[y, x, c] = new_pixel
+
+        new_matrix = np.clip(new_matrix, 0, 255).astype(np.uint8)
+        return Image.fromarray(new_matrix)
+    
+    @staticmethod
+    def edge_detection(image: Image) -> Image:
+        """Határvonalak megtalálása a képen"""
+
+        img = image.load()
+        arr = np.array(img)
+        height, width, color = arr.shape
+
+        kernel_box_y= [
+            [-1, -2, -1],
+            [0, 0, 0],
+            [1, 2, 1]
+        ]
+        kernel_box_y = np.array(kernel_box_y)
+        kernel_height_y, kernel_width_y = kernel_box_y.shape
+
+        kernel_box_x = [
+            [-1, 0, 1],
+            [-2, 0, 2],
+            [-1, 0, 1]
+        ]
+        kernel_box_x = np.array(kernel_box_x)
+        kernel_height_x, kernel_width_x = kernel_box_x.shape
+
+        padded = np.pad(arr, ((1, 1), (1, 1), (0, 0)), mode="edge")
+        new_matrix_y = np.zeros_like(arr)
+        new_matrix_x = np.zeros_like(arr)
+
+        for y in range(height):
+            for x in range(width):
+                for c in range(color):
+                    region_y = padded[y:y + 3, x:x + 3, c]
+                    region_x = padded[y:y + 3, x:x + 3, c]
+                    new_pixel_y = np.sum(region_y * kernel_box_y)
+                    new_pixel_x = np.sum(region_x * kernel_box_x)
+                    new_matrix_y[y, x, c] = new_pixel_y
+                    new_matrix_x[y, x, c] = new_pixel_x
+
+        new_matrix = abs(new_matrix_y) + abs(new_matrix_x)
+        new_matrix = np.clip(new_matrix, 0, 255).astype(np.uint8)
+        return Image.fromarray(new_matrix)
+
+    
+    @staticmethod
+    def sharpening(image: Image) -> Image:
+        """Kép élesítése """
+
+        img = image.load()
+        arr = np.array(img)
+        height, width, color = arr.shape
+
+        kernel_box = [
+            [0, -1, 0],
+            [-1, 5, -1],
+            [0, -1, 0]
+        ]
+        kernel_box = np.array(kernel_box)
+        kernel_height, kernel_width = kernel_box.shape
+
+        padded = np.pad(arr, ((1, 1), (1, 1), (0, 0)), mode="edge")
+        new_matrix = np.zeros_like(arr)
+
+        for y in range(height):
+            for x in range(width):
+                for c in range(color):
+                    region = padded[y:y + 3, x:x + 3, c]
+                    new_pixel = np.sum(region * kernel_box)
+                    new_matrix[y, x, c] = new_pixel
+
+        new_matrix = np.clip(new_matrix, 0, 255).astype(np.uint8)
+        return Image.fromarray(new_matrix)
+
+class CommandLineInterface:
+    @staticmethod
+    def build_parser():
+        """Argomentumok fevétele"""
+
+        parser = argparse.ArgumentParser(description = "PictureEditor")
+
+        common = argparse.ArgumentParser(add_help=False)
+        input_group = common.add_mutually_exclusive_group(required=True)
+        input_group.add_argument("--path", help="Bemenet fájlból (helyi elérési út)")
+        input_group.add_argument("--url", help="Bemenet URL-ről")
+        common.add_argument("--output", required=False, help="Mentési fájlnév")
+
+        subparsers = parser.add_subparsers(dest="command", required=True)
+
+        brightness_parser = subparsers.add_parser("brightness", help="Kép fényerejének állítása", parents=[common])
+        brightness_parser.add_argument("--constant", type=float, required=True, help = "Sötétítéshez adj meg negatív, világosításhoz pozitív számot")
+
+        contrast_parser = subparsers.add_parser("contrast", help= "Kép kontrasztosságának beállítása", parents=[common])
+        contrast_parser.add_argument("--contrast", type=float, required=True, help ="Ennyivel fog változni a kontraszt")
+
+        subparsers.add_parser("invert", help= "Negatív inverziós kép készítése", parents=[common])
+
+        subparsers.add_parser("blur", help="Elmossa a képet", parents=[common])
+
+        subparsers.add_parser("edge_detection", help= "Éldetektálás", parents=[common])
+
+        subparsers.add_parser("sharpen", help="Élesíti a képet", parents=[common])
+
+        return parser
+
+    @staticmethod
+    def main() -> None:
+        parser = CommandLineInterface.build_parser()
+        args = parser.parse_args()
+
+        loader = PictureLoader()
+
+        if args.path:
+            image, og = loader.load_from_computer(args.path)
+        else:
+            image, og = loader.load_from_url(args.url)
+
+        if args.command == "brightness":
+            result = PictureEdit.brightness(image, args.constant)
+        elif args.command == "contrast":
+            result = PictureEdit.contrast(image, args.contrast)
+        elif args.command == "invert":
+            result = PictureEdit.invert(image)
+        elif args.command == "blur":
+            result = PictureEdit.blurring(image)
+        elif args.command == "edge_detection":
+            result = PictureEdit.edge_detection(image)
+        elif args.command == "sharpen":
+            result = PictureEdit.sharpening(image)
+        else:
+            parser.print_help()
+            return
+
+        loader.image = result
+        loader.save_ppm(args.output)
+
+if __name__ == "__main__":
+    CommandLineInterface.main()
+
+
